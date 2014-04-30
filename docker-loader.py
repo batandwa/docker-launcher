@@ -6,40 +6,40 @@ import re
 import ConfigParser
 import subprocess
 
-def main(container_name, config):
+def main(config):
   if len(sys.argv) == 1:
     print 'No action specified'
     exit(1)
   elif sys.argv[1] == 'stop':
-    stop(container_name, config)
+    stop(config)
   elif sys.argv[1] == 'kill':
-    kill(container_name, config)
+    kill(config)
   elif sys.argv[1] == 'start':
-    start(container_name, config)
+    start(config)
   elif sys.argv[1] == 'restart':
-    restart(container_name, config)
+    restart(config)
 
-def stop(container_name, config):
-  print 'Stopping container ' + container_name
-  subprocess.call(['sudo', 'docker', 'stop', container_name])
+def stop(config):
+  print 'Stopping container ' + config.get('default', 'container name')
+  subprocess.call(['sudo', 'docker', 'stop', config.get('default', 'container name')])
 
-def kill(container_name, config):
-  stop(container_name, config)
-  print 'Removing container ' + container_name
-  subprocess.call(['sudo', 'docker', 'rm', container_name])
+def kill(config):
+  stop(config)
+  print 'Removing container ' + config.get('default', 'container name')
+  subprocess.call(['sudo', 'docker', 'rm', config.get('default', 'container name')])
 
-def restart(container_name, config):
-  kill(container_name, config)
-  start(container_name, config)
+def restart(config):
+  kill(config)
+  start(config)
 
-def start(container_name, config):
+def start(config):
   # print 'Restarting dnsmasq'
   # subprocess.call(['sudo', '/etc/init.d/dnsmasq', 'restart'])
   # print 'Fixing permissions'
   # subprocess.call(['sudo', 'chmod', '0777', 'logs', '-Rf'])
   # print 'Generating site config files'
   # subprocess.call(['scripts/containerinfo.py'])
-  print 'Running container %s' % (container_name, )
+  print 'Running container %s' % (config.get('default', 'container name'), )
   # TODO: Put these in a settings file.
   call_parameters = ['sudo', 'docker', 'run']
   detached = config.getboolean('default', 'detached')
@@ -66,11 +66,6 @@ if __name__ == '__main__':
   current_folder_path, current_folder_name = os.path.split(os.getcwd())
   config = ConfigParser.RawConfigParser()
   config.read(current_folder_path + '/' + current_folder_name + '/docker-loader.conf')
-  # print config.get('default', 'proxy')
-  # print config.items('volumes')
-  # a_float = config.getfloat('a_float')
-  # print config
 
-  container_name = re.sub(r'[^a-zA-Z\-_ ]', '', current_folder_name.lower()).replace(' ', '-').replace('--', '-')
-  main(container_name, config)
+  main(config)
 
