@@ -1,0 +1,14 @@
+[default]
+container name: my-container
+image name: ubuntu
+detached: yes
+proxy: web-proxy
+
+[volumes]
+/docker: %(dir)
+/var/www: %(dir)/site
+/var/lib/mysql: %(dir)/mysql
+
+[permissions]
+%(dir)/mysql: 0777
+%(dir)/site: 0777
